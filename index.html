@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeHer - Women Safety App 💗</title>
+
+    <!-- ── Stylesheet ── -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ════════════════════════════════════════
+         HEADER
+    ════════════════════════════════════════ -->
+    <header>
+        <div class="header-content">
+            <h1>💗 <span id="appName">SafeHer</span></h1>
+            <div class="header-controls">
+                <select class="language-select" id="languageSelect" onchange="changeLanguage()">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी</option>
+                </select>
+                <button class="dark-mode-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 Dark</button>
+                <button class="flashlight-btn" id="flashlightBtn" onclick="toggleFlashlight()">🔦</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ════════════════════════════════════════
+         MAIN CONTENT
+    ════════════════════════════════════════ -->
+    <main>
+
+        <!-- ── Home Page ── -->
+        <div id="homePage" class="page active">
+
+            <!-- Emergency Button -->
+            <div class="emergency-btn" id="emergencyBtn" onclick="toggleEmergency()">
+                <div class="emergency-content">
+                    <div class="emergency-icon" id="emergencyIcon">⚠️</div>
+                    <div class="emergency-title" id="emergencyTitle">Tap to Activate Emergency</div>
+                    <div class="emergency-subtitle" id="emergencySubtitle">Tap &amp; Hold for 3 Seconds</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Grid -->
+            <div class="grid">
+                <button class="action-btn routes" onclick="navigateTo('routesPage')">
+                    <span class="action-icon">🗺️</span>
+                    <span id="saferRouteText">Safer Routes</span>
+                </button>
+                <button class="action-btn contacts" onclick="navigateTo('contactsPage')">
+                    <span class="action-icon">📞</span>
+                    <span id="contactsText">Emergency Contacts</span>
+                </button>
+                <button class="action-btn location" onclick="toggleLocationSharing()">
+                    <span class="action-icon">📍</span>
+                    <span id="locationText">Share Location</span>
+                    <span id="locationStatus" class="location-shared-badge" style="display:none;">✓ Shared!</span>
+                </button>
+                <button class="action-btn chat" onclick="openChat()">
+                    <span class="action-icon">💬</span>
+                    <span id="chatText">Safety Chat</span>
+                </button>
+            </div>
+
+            <!-- Safety Tips -->
+            <div class="safety-tips">
+                <h2>🛡️ <span id="safetyTipsTitle">Stay Alert, Stay Safe</span></h2>
+                <div id="safetyTipsList"></div>
+            </div>
+        </div>
+
+        <!-- ── Contacts Page ── -->
+        <div id="contactsPage" class="page">
+            <button class="back-btn" onclick="navigateTo('homePage')">← <span id="homeText">Home</span></button>
+            <h2>📞 <span id="emergencyContactsTitle">Emergency Contacts</span></h2>
+
+            <div class="grid" id="emergencyContactsGrid"></div>
+
+            <h3 id="trustedPeopleTitle">Trusted People</h3>
+            <div id="trustedContactsList"></div>
+        </div>
+
+        <!-- ── Routes Page ── -->
+        <div id="routesPage" class="page">
+            <button class="back-btn" onclick="navigateTo('homePage')">← <span id="homeText2">Home</span></button>
+            <h2>🗺️ <span id="saferRouteTitle">Safer Routes</span></h2>
+
+            <!-- Nearby search buttons -->
+            <div class="grid">
+                <button class="action-btn" id="btnHospitals"
+                        style="background-color:#fef3c7;color:#92400e;border-color:#d97706;"
+                        onclick="searchNearby('hospital')">
+                    🏥 <span id="hospitalsText">Hospitals</span>
+                </button>
+                <button class="action-btn" id="btnPolice"
+                        style="background-color:#fef3c7;color:#92400e;border-color:#d97706;"
+                        onclick="searchNearby('police')">
+                    🚔 <span id="policeStationsText">Police Stations</span>
+                </button>
+                <button class="action-btn" id="btnSafeZones"
+                        style="background-color:#fef3c7;color:#92400e;border-color:#d97706;"
+                        onclick="searchNearby('safe_zone')">
+                    ✓ <span id="safeZonesText">Safe Zones</span>
+                </button>
+            </div>
+
+            <!-- Destination input row (shown when Find Safe Route clicked) -->
+            <div id="destination-row">
+                <input type="text" id="destinationInput" placeholder="Enter destination address…" />
+                <button id="getRouteBtn" onclick="showDirections()">🧭 Go</button>
+            </div>
+
+            <!-- Route distance / duration info bar -->
+            <div id="route-info">
+                <span>📏 Distance: <span id="routeDistance">—</span></span>
+                <span>⏱ Duration: <span id="routeDuration">—</span></span>
+            </div>
+
+            <!-- Map wrapper: spinner + map canvas + results -->
+            <div id="map-wrapper">
+                <div id="map-spinner"><div class="spinner-ring"></div></div>
+                <div id="map-section">
+                    <div id="map"></div>
+                    <div id="results"></div>
+                </div>
+            </div>
+
+            <!-- Hidden: keeps translation keys working -->
+            <div style="display:none;">
+                <p id="selectDestination">Select your destination</p>
+                <button id="findSafeRouteBtn" onclick="toggleDestinationRow()">
+                    <span id="findSafeRouteText">Find Safe Route</span>
+                </button>
+            </div>
+
+            <!-- Visible "Find Safe Route" card -->
+            <div style="background-color:#fef3c7;border:4px solid #d97706;border-radius:1rem;
+                        padding:1.5rem;text-align:center;margin-top:1.5rem;">
+                <div style="font-size:2.5rem;margin-bottom:0.5rem;">🧭</div>
+                <p style="font-size:1.1rem;font-weight:bold;color:#92400e;">
+                    Want turn-by-turn directions?
+                </p>
+                <button onclick="toggleDestinationRow()"
+                        style="margin-top:1rem;padding:0.85rem 2rem;background-color:#d97706;
+                               color:white;border:none;border-radius:0.5rem;font-weight:bold;
+                               font-size:1.05rem;cursor:pointer;">
+                    🗺️ Find Safe Route
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ════════════════════════════════════════
+         CHAT MODAL
+    ════════════════════════════════════════ -->
+    <div id="chatModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💬 <span id="chatbotTitle">Safety Chat</span></h3>
+                <button class="close-btn" onclick="closeChat()">✕</button>
+            </div>
+            <div class="modal-messages empty" id="chatMessages">
+                <div style="font-size:2.25rem;margin-bottom:0.5rem;">💬</div>
+                <p style="font-weight:600;color:#831843;" id="askHelpText">Ask for help or tips...</p>
+            </div>
+            <div class="modal-input">
+                <input type="text" id="chatInput" placeholder="Ask...">
+                <button onclick="sendMessage()">📤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         BOTTOM NAVIGATION
+    ════════════════════════════════════════ -->
+    <nav>
+        <button onclick="navigateTo('homePage')"    class="nav-btn active" data-page="homePage">🏠</button>
+        <button onclick="navigateTo('contactsPage')" class="nav-btn"       data-page="contactsPage">📞</button>
+        <button onclick="navigateTo('routesPage')"   class="nav-btn"       data-page="routesPage">🗺️</button>
+    </nav>
+
+    <!-- ════════════════════════════════════════
+         SCRIPTS
+         app.js MUST load before the Maps API
+         so initMap() is defined when the
+         Google callback fires.
+    ════════════════════════════════════════ -->
+
+    <!-- 1. Application logic -->
+    <script src="app.js"></script>
+
+    <!-- 2. Google Maps JavaScript API
+         ⚠️  Replace YOUR_GOOGLE_MAPS_API_KEY with your real key.
+         Required APIs to enable in Google Cloud Console:
+           - Maps JavaScript API
+           - Places API
+           - Directions API
+    -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOLldj-O8pG4HtIPS2BBoOTZ7mHxsuh6s&libraries=places&callback=initMap"
+        async defer>
+    </script>
+
+</body>
+</html>
